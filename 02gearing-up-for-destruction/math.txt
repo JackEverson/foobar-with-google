@@ -1,0 +1,74 @@
+# Math calculating the pegs
+
+We are trying to calculate the radius of the first peg which will give a ratio of 2:1 with the last peg (ie the last peg is half the size of the first peg).
+
+## For 2 pegs
+
+    r[0] = radius of peg[0]
+    r[1] = radius of peg[1]
+
+because r[0] needs to be 2* the size of r[1], half of r[0] will equal r[1].
+    0.5r[0] = r[1]
+
+We will be supplied two numbers, this is the distance of the pegs from a point.
+    peg[0] = supplied
+    peg[1] = supplied
+
+The difference in these numbers is the distance between peg[0] and peg[1].
+    peg[1]-peg[0] = d[0]
+
+the sum of x and y therefore has to equal the seperation distance (othewise the the gears won't fit).
+	r[0] + r[1] = d[0]
+	r[1] = d[0] - r[0]
+
+we know 0.5r[0] = r[1] so we use some substitution of what we know.
+	0.5r[0] = d[0] - r[0]
+
+    1.5r[0] = d[0]       
+    r[0] = (d[0])/1.5	<-------equation for being supplied 2 pegs!
+
+
+as we are supplied the distances of the pegs seperated we can use this equation to easily get our answer from a simple program.
+
+## For 3 pegs
+we now have an extra peg.
+    r[0] = radius of peg[0]
+    r[1] = radius of peg[1]
+    r[2] = radius of peg[2]
+    d[0] = peg[1]-peg[0]
+    d[1] = peg[2]-peg[1]	#remembering that peg[#] refers to the distance a peg is from the structure
+
+We now have two equations relating to the distance between each pegs, plus we still know that r[0] has to be twice the size of the last peg r[-1] (or r[2] in this case).
+    0.5r[0] = r[2]
+    r[0]+r[1] = d[0]
+    r[1]+r[2] = d[1]
+    
+We need to do more substitution now. We are aiming to solve for r[0] using only d[#] values (as these are provided to the program each time it is run).
+	r[2] = d[1]-r[1]
+	r[1] = d[0]-r[0]
+	
+	0.5r[0] = r[2] #need to sub to remove the r[2]	
+	
+	0.5r[0] = d[1]-r[1]
+	0.5r[0] = d[1]-d[0]+r[0]
+	-0.5r[0] = d[1]-d[0]
+	r[0] = (d[0]-d[1])/0.5	<-------equation to solve for 3 pegs!
+
+### For 4 pegs 
+Solving for 4 pegs now
+	r[3] = d[2]-r[2]
+	r[2] = d[1]-r[1]
+	r[1] = d[0]-r[0]
+	
+	0.5r[0] = r[3] 		#The first peg is double the size of the final peg
+
+	0.5r[0] = d[2]-r[2]
+	0.5r[0] = d[2]-d[1]+r[1]
+	0.5r[0] = d[2]-d[1]+d[0]-r[0]
+  	1.5r[0] = d[2]-d[1]+d[0]
+	r[0] = (d[0]-d[1]+d[2])/1.5		<--------equation to solve for 4 pegs!
+
+ 
+
+
+	
