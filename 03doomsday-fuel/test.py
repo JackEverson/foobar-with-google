@@ -1,8 +1,14 @@
 import numpy as np
 
-x = np.zeros([3])
-size = x[0].size
+numerator_list = [1, 1]
+denominator_list = [2, 2]
 
-for y in x:
-    print(y)
-    print("###") 
+lcm = np.lcm.reduce(denominator_list)
+
+for idx, i in enumerate(numerator_list):
+        x = lcm / denominator_list[idx]
+        numerator_list[idx] = (x * i)
+
+
+print lcm    
+print numerator_list

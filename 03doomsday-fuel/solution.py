@@ -1,77 +1,62 @@
+# a shout out to Ivanseed at https://github.com/ivanseed/google-foobar-help/blob/master/challenges/doomsday_fuel/doomsday_fuel.md. This really helped me get my head around Markov absorbing chains (noting a have very little experience with linear algebra so I learnt ALOT!)
+# Also a shout out to KaustubhRakhade's comment here https://gist.github.com/algomaster99/782b898177ca37bfbf955cec416bb6a4. This helped me clean up my data transformations before this I was trying to use the fractions module which kept either outputting strange data or was just outright erroring out.
+
 def solution(m):
     import numpy as np
-    import fractions
-    import math
+    active = []
+    terminal = []
     
-    initial_matrix = np.array(m, dtype='int')
-    a_size = initial_matrix[0].size
-    ordered_array = np.zeros([a_size,a_size], dtype='int')
+    for i, row in enumerate(m):
+        (active if sum(row) else terminal).append(i)
     
-    start_position = 0
-    end_position = a_size - 1
-    index_array = np.zeros([2, a_size], dtype='int')
+    if 0 in terminal:
+        x = [1] + [0]*len(terminal[1:]) + [1]
+        return x
     
-    for i, x in enumerate(initial_matrix[:]):
-        absorbing = True
-        for y in x[:]:
-            if y != 0:
-                absorbing = False
-                break
-        if absorbing == True:
-            index_array[0][start_position] = i
-            index_array[1][start_position] = 1
-            start_position += 1
-        else:
-            index_array[0][end_position] = i
-            end_position -= 1
-    
-    B = np.zeros([(a_size - start_position) , a_size])
-    
-    idx = 0
-    
-    for i, x in enumerate(index_array[0]):
-        if index_array[1][i] == 1:
-            continue
-        sum = np.sum(m[x])
-        for j, y in enumerate(index_array[0]):          
-            B[idx][j] = m[x][y] / sum
-        idx += 1
-    
-    R = np.array(B[0: (a_size - start_position), 0:start_position])
-    Q = np.array(B[(a_size - start_position):a_size, start_position:a_size])
-    
-    Q = np.array(B[0: (a_size - start_position), start_position:a_size])
-    
-    I = np.identity(Q[0].size)
-    IminusQ = np.subtract(I,Q)
-    F = np.linalg.inv(IminusQ)
-
-    FR = np.matmul(F, R)
-    
-    ##### need to fix from here onwards. Issues with fractions!!!!
-    
-    fraction_list = list()
-    for i in FR[0]:
-        print(i)
-        print(fractions.Fraction(i))
-        fraction_list.append(fractions.Fraction(i).limit_denominator)
-    
-    print(fraction_list)
-    
-    lcm = np.lcm.reduce([fr.denominator for fr in FR[0]])
-    
-    output_list = [int(fr.numerator * lcm / fr.denominator) for fr in FR[0]]
-    output_list.append(lcm)
-    
-    return lcm
-                            
-
+    active_matrix = np.matrix(m, dtype=float)[active, :]
     
 
+    percent_chance_matrix = active_matrix / active_matrix.sum(1) # matrix of chance of changing into something rather than value of it, this only repesents the active states
+    
+    Q = percent_chance_matrix[:, active]
+    R = percent_chance_matrix[:, terminal]   # separating Q and R matrixes using what is active and what is terminal states
+    I = np.identity(len(Q))  
+    F = np.linalg.inv(I - Q)
+    
+    cd = np.prod(active_matrix.sum(1)) #common denominator
+    
+    B = F[0] * R * cd / np.linalg.det(F)    #this is the point my understanding of the math starts to give out, need to learn more linear algebra
+       
+    final_list = B.round().astype(int).A1
+    gcd = np.gcd.reduce(final_list)
+    final_list = (final_list/gcd).astype(int)
+    lcd = final_list.sum() 
+    final_list = np.append(final_list, lcd)
+    
+    return final_list
+    
+    # print("percent chance matrix")
+    # print percent_chance_matrix
+    # print("Q")
+    # print Q
+    # print("R")
+    # print R
+    # print("F")
+    # print F
+    # print "B"
+    # print B
+    # print "lcd"
+    # print lcd
 
-# beyond this point is for testing and debugging
+    
+test_list = [0]    
+    
+solution(test_list)    
 
-# print(solution([[0, 1, 0, 0, 0, 1], [4, 0, 0, 3, 2, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]))
-print(solution([[0, 1, 0, 0, 0, 1], [4, 0, 0, 3, 2, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]))
+solution([[0, 2, 1, 0, 0], [0, 0, 0, 3, 4], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]])
 
+solution([[0, 1, 0, 0, 0, 1], [4, 0, 0, 3, 2, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]])
 # answer should be [0, 3, 2, 9, 14]
+
+solution([[0,1], [0,0]])
+print(solution([[0, 1, 1, 1, 1,],  [0, 0, 0, 0, 0,], [1, 1, 0, 1, 1,], [0, 0, 0, 0, 0,], [1, 1, 1, 1, 0,] ]))
